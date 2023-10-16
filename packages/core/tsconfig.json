@@ -19,5 +19,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "packages/core/libs/parser.ts", "packages/core/libs/bitReader.ts", "packages/core/libs/decompress.ts", "packages/core/libs/helper.ts", "packages/core/types/index.d.ts"]
+  "include": ["libs", "index.ts", "types/index.d.ts", "vite-env.d.ts"]
 }

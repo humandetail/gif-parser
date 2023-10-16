@@ -1,0 +1,53 @@
+{
+  "name": "@humandetail/gif-parser",
+  "private": false,
+  "version": "0.0.1",
+  "author": "humandetail",
+  "keywords": [
+    "gif",
+    "parser",
+    "image",
+    "ui",
+    "typescript"
+  ],
+  "description": "parse image/gif file",
+  "type": "module",
+  "main": "dist/gif-parser.js",
+  "browser": "dist/gif-parser.js",
+  "module": "dist/gif-parser.js",
+  "files": [
+    "dist/*"
+  ],
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/gif-parser.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "unpkg": "dist/gif-parser.js",
+  "jsdelivr": "dist/gif-parser.js",
+  "homepage": "https://github.com/humandetail/gif-parser",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/humandetail/gif-parser"
+  },
+  "bugs": {
+    "url": "https://github.com/humandetail/gif-parser/issues"
+  },
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "build:dev": "pnpm run build --mode development",
+    "preview": "vite preview",
+    "release": "release-it"
+  },
+  "devDependencies": {
+    "@release-it/conventional-changelog": "^5.1.1",
+    "release-it": "^15.10.3",
+    "typescript": "^5.0.4",
+    "vite": "^4.2.0",
+    "vite-plugin-dts": "^2.3.0"
+  }
+}
