@@ -99,29 +99,21 @@ const readSubData = (blocks: number[][], minCodeSize: number) => {
 
   let isInitialized = false
 
+  init()
+
   blocks.forEach(block => {
     // const bitArray = createBitArray(block)
     br.pushBytes(block)
     while (br.hasBits(size)) {
       // 让 `CODE` 成为 code stream 中的第一个代码
       const code = br.readBits(size)
+
       if (code === eoiCode) {
         codeStream.push(code)
         break
       } else if (code === clearCode) {
         // 当遇到 clearCode 时，开启新一个单元的解析
-        codeUnits.push({ stream: [], table: [] })
-        codeStream = codeUnits[codeUnits.length - 1].stream
-        codeTable = codeUnits[codeUnits.length - 1]!.table
-        // 填充 codeTable
-        for (let i = 0; i <= eoiCode; i++) {
-          codeTable[i] = (i < clearCode) ? [i] : []
-        }
-        // 重置数据
-        lastCode = eoiCode
-        size = minCodeSize + 1
-        growCode = (2 << size - 1) - 1
-        isInitialized = false
+        init()
       } else if (!isInitialized) {
         // 输出 `{CODE}` 到 index stream
         indexStream.push(...codeTable[code])
@@ -129,7 +121,7 @@ const readSubData = (blocks: number[][], minCodeSize: number) => {
       } else {
         let k = 0
 
-        const prevCode = codeStream[codeStream.length - 1]
+        const prevCode = codeStream.at(-1)!
 
         // 判断：`CODE` 在 code table 中
         if (code <= lastCode) {
@@ -158,6 +150,21 @@ const readSubData = (blocks: number[][], minCodeSize: number) => {
       codeStream.push(code)
     }
   })
+
+  function init () {
+    codeUnits.push({ stream: [], table: [] })
+    codeStream = codeUnits[codeUnits.length - 1].stream
+    codeTable = codeUnits[codeUnits.length - 1]!.table
+    // 填充 codeTable
+    for (let i = 0; i <= eoiCode; i++) {
+      codeTable[i] = (i < clearCode) ? [i] : []
+    }
+    // 重置数据
+    lastCode = eoiCode
+    size = minCodeSize + 1
+    growCode = (2 << size - 1) - 1
+    isInitialized = false
+  }
 
   return indexStream
 }
