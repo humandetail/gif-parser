@@ -11,7 +11,7 @@ import type { ParsedImage, ParsedImageItem } from '@humandetail/gif-parser'
 const data = inject('data', ref<ParsedImage | null>(null))
 const containerRef = ref<HTMLDivElement | null>(null)
 
-const draw = ({ width, height, delayTime, imageData }: ParsedImageItem) => {
+const draw = ({ delayTime, imageData }: ParsedImageItem, width = 0, height = 0) => {
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')!
 
@@ -28,7 +28,7 @@ const draw = ({ width, height, delayTime, imageData }: ParsedImageItem) => {
 watchEffect(() => {
   if (data.value) {
     const list = data.value.images.map(image => {
-      return draw(image)
+      return draw(image, data.value?.width, data.value?.height)
     })
     if (containerRef.value) {
       containerRef.value.innerHTML = ''

@@ -1,5 +1,5 @@
 import { createBitReader } from './bitReader'
-import type { CodeUnitItem, GraphicData, ParsedImage, ParsedImageItem, RGBA } from '../types'
+import type { CodeUnitItem, GraphicData, ImageDescriptor, ParsedImage, ParsedImageItem, RGB } from '../types'
 
 export const decompressLZW = (data: GraphicData): ParsedImage => {
   const {
@@ -19,6 +19,11 @@ export const decompressLZW = (data: GraphicData): ParsedImage => {
     ? globalColorTable![backgroundColorIndex!]
     : null
 
+  // 初始化 canvas, 用于生成 imageData
+  const canvas = document.createElement('canvas')
+
+  Object.assign(canvas, { width, height })
+
   const images = data.images.map<ParsedImageItem>(image => {
     const {
       localColorTable,
@@ -32,8 +37,8 @@ export const decompressLZW = (data: GraphicData): ParsedImage => {
       localColorTableFlag,
       left,
       top,
-      width,
-      height
+      width: w,
+      height: h
     } = imageDescriptor || {}
 
     const {
@@ -52,23 +57,26 @@ export const decompressLZW = (data: GraphicData): ParsedImage => {
 
     // 解析成索引流
     const indexStream = readSubData(subData, minCodeSize)
-    // 解析成图像数据数组
-    const value = indexStream.map<RGBA>(item => {
-      return (transparencyFlag && item === transparencyIndex)
-        ? [0, 0, 0, 0]
-        : [...colorTable[item], 255]
-    })
+    // 解析成图像数据
+    const imageData = transfer2imageData(
+      canvas,
+      indexStream,
+      colorTable,
+      imageDescriptor,
+      transparencyFlag ? transparencyIndex : -1,
+      disposal
+    )
 
     return {
       left: left || 0,
       top: top || 0,
-      width: width || 0,
-      height: height || 0,
+      width: w || 0,
+      height: h || 0,
       disposal: disposal || 0,
       delayTime: delayTime || 0,
       transparencyFlag: !!transparencyFlag,
       transparencyIndex: transparencyIndex || 0,
-      imageData: transfer2imageData(value, width || 0, height || 0)
+      imageData
     }
   })
 
@@ -169,21 +177,43 @@ const readSubData = (blocks: number[][], minCodeSize: number) => {
   return indexStream
 }
 
-const transfer2imageData = (value: RGBA[], width: number, height: number) => {
-  const canvas = document.createElement('canvas')
-  const ctx = canvas.getContext('2d')!
+const transfer2imageData = (
+  canvas: HTMLCanvasElement,
+  indexStream: number[],
+  colorTable: RGB[],
+  imageDescriptor: ImageDescriptor | null,
+  transparencyIndex = -1,
+  disposal = 0
+) => {
+  const ctx = canvas.getContext('2d', { willReadFrequently: true })!
 
-  Object.assign(canvas, { width, height })
-
-  const imageData = ctx.getImageData(0, 0, width, height)
-
-  for (let i = 0; i < value.length; i++) {
-    const [r = 0, g = 0, b = 0, a = 0] = value[i]
-    imageData.data[i * 4 + 0] = r
-    imageData.data[i * 4 + 1] = g
-    imageData.data[i * 4 + 2] = b
-    imageData.data[i * 4 + 3] = a
+  // 恢复为背景色，图形所使用的区域必须还原为背景色
+  if (disposal === 2) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
   }
 
-  return imageData
+  const {
+    left = 0,
+    top = 0,
+    width = 0,
+    height = 0
+  } = imageDescriptor || {}
+
+  const imageData = ctx.getImageData(left, top, width, height)
+  const { data } = imageData
+
+  indexStream.forEach((item, index) => {
+    // 当前像素为透明时，跳过并处理下一个像素
+    if (item !== transparencyIndex) {
+      const [r, g, b, a = 255] = colorTable[item]
+      data[index * 4] = r
+      data[index * 4 + 1] = g
+      data[index * 4 + 2] = b
+      data[index * 4 + 3] = a
+    }
+  })
+
+  ctx.putImageData(imageData, left, top, 0, 0, width, height)
+
+  return ctx.getImageData(0, 0, canvas.width, canvas.height)
 }
