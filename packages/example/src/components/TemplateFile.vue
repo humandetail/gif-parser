@@ -22,10 +22,12 @@
 <script setup lang="ts">
 import { inject, ref } from 'vue'
 
+const basePath = import.meta.env.VITE_APP_PATHNAME
+
 const imgs = [
-  '/imgs/1.gif',
-  '/imgs/2.gif',
-  '/imgs/3.gif'
+  `${basePath}imgs/1.gif`,
+  `${basePath}imgs/2.gif`,
+  `${basePath}imgs/3.gif`
 ]
 
 const currentFile = inject('currentFile', ref<string | File | null>(null))
