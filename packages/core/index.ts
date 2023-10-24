@@ -2,6 +2,7 @@ import { decompressLZW } from './libs/decompress'
 import { readFile } from './libs/fileReader'
 import { parseDataView } from './libs/parser'
 import { rebuildGIF } from './libs/rebuild'
+import { compress, buildImageFromBytes } from './libs/compress'
 
 export type * from './types'
 
@@ -18,5 +19,7 @@ const parse = async (source: string | File) => {
 
 export {
   rebuildGIF,
-  parse
+  parse,
+  compress,
+  buildImageFromBytes
 }
