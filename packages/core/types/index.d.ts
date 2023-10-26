@@ -1,7 +1,7 @@
 export type RGB = [number, number, number]
 export type RGBA = [...RGB, number]
 
-export type SubData = number[]
+export type SubBlocks = number[]
 
 export interface LogicalScreenDescriptor {
   width: number
@@ -65,11 +65,11 @@ interface Extension {
 export interface ApplicationExtension extends Extension {
   identifier: string[],
   authCode: string[],
-  data: SubData[]
+  data: SubBlocks[]
 }
 
 export interface CommentExtension extends Extension {
-  data: SubData[],
+  data: SubBlocks[],
 }
 
 /** 图形控制扩展块 */
@@ -121,7 +121,7 @@ export interface PlainTextExtension extends Extension {
   cellHeight: number
   foregroundColorIndex: number
   backgroundColorIndex: number
-  data: SubData[]
+  data: SubBlocks[]
 }
 
 export interface ImageDescriptor {
@@ -146,7 +146,7 @@ export interface ImageBytes {
   data: null | {
     minCodeSize: number
     terminator: number,
-    subData: SubData[]
+    subBlocks: SubBlocks[]
   },
   plainTextExtension: PlainTextExtension | null
   imageDescriptor: ImageDescriptor | null

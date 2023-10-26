@@ -1,5 +1,5 @@
 import { computedSize, packedRGB } from './helper'
-import type { Context, SubData } from '../types'
+import type { Context, SubBlocks } from '../types'
 
 const createContext = (dataView: DataView): Context => {
   return {
@@ -194,7 +194,7 @@ const parseApplicationExtension = (context: Context, introducer: number, label: 
   const size = context.consume()
   const identifier = context.getValue(8)
   const authCode = context.getValue(3)
-  const data: SubData[] = []
+  const data: SubBlocks[] = []
 
   let subDataSize = context.consume()
   while (subDataSize !== 0x00) {
@@ -222,15 +222,15 @@ const parseApplicationExtension = (context: Context, introducer: number, label: 
 }
 
 const parseCommentExtension = (context: Context, introducer: number, label: number) => {
-  const data: SubData[] = []
+  const data: SubBlocks[] = []
 
-  let subDataSize = context.consume()
-  while (subDataSize !== 0x00) {
-    data.push(context.getValue(subDataSize))
-    subDataSize = context.consume()
+  let subBlocksSize = context.consume()
+  while (subBlocksSize !== 0x00) {
+    data.push(context.getValue(subBlocksSize))
+    subBlocksSize = context.consume()
   }
 
-  const terminator = subDataSize
+  const terminator = subBlocksSize
 
   if (terminator !== 0) {
     throw new Error(`Terminator parse error: ${terminator}`)
@@ -295,7 +295,7 @@ const parsePlainTextExtension = (context: Context, introducer: number, label: nu
   const foregroundColorIndex = context.consume()
   const backgroundColorIndex = context.consume()
 
-  const data: SubData[] = []
+  const data: SubBlocks[] = []
 
   let subDataSize = context.consume()
   while (subDataSize !== 0x00) {
@@ -378,18 +378,18 @@ const parseLocalColorTable = (context: Context) => {
 const parseImageSubData = (context: Context) => {
   const lastImage = context.graphicData.images.at(-1)!
   const minCodeSize = context.consume()
-  const subData = []
+  const subBlocks = []
 
   let byte = context.consume()
 
   while (byte !== 0) {
-    subData.push(context.getValue(byte))
+    subBlocks.push(context.getValue(byte))
     byte = context.consume()
   }
 
   lastImage.data = {
     minCodeSize,
     terminator: byte,
-    subData
+    subBlocks
   }
 }

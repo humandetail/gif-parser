@@ -1,4 +1,4 @@
-import { ImageBytes, SubData } from '../types'
+import { ImageBytes, SubBlocks } from '../types'
 import { decimal2Uint8Array, uint8Array2decimal } from './helper'
 
 interface CodeTable {
@@ -20,7 +20,7 @@ interface CompressContext {
   codeUnits: CodeUnit[]
   increase: () => void
   reset: () => void
-  bitTemp: number[]
+  bitStream: number[]
   readonly codeStream: number[]
   readonly codeTable: CodeTable[]
 
@@ -53,7 +53,7 @@ const createContext = (indexStream: number[], minCodeSize: number): CompressCont
       })
     },
     // 收集 bit 数据，之后组装成 bytes
-    bitTemp: [],
+    bitStream: [],
     get codeStream () {
       return this.codeUnits.at(-1)!.codeStream
     },
@@ -112,7 +112,7 @@ const getCodeByIndexBuffer = (indexBuffer: number[], codeTable: CodeTable[]) => 
 
 const pushCode = (code: number, context: CompressContext) => {
   context.codeStream.push(code)
-  context.bitTemp.unshift(...decimal2Uint8Array(code, context.firstCodeSize))
+  context.bitStream.unshift(...decimal2Uint8Array(code, context.firstCodeSize))
 }
 
 const packedBytes = (bitArray: number[], minCodeSize: number) => {
@@ -159,15 +159,15 @@ export const buildImageFromBytes = (bytes: number[]): ImageBytes['data'] => {
   const val = bytes.slice(1, -1)
 
   let len = val.shift()!
-  const subData: SubData[] = []
+  const subBlocks: SubBlocks[] = []
   while (len > 0) {
-    subData.push(val.splice(0, len))
+    subBlocks.push(val.splice(0, len))
     len = val.shift()!
   }
 
   return {
     minCodeSize,
-    subData,
+    subBlocks,
     terminator
   }
 }
@@ -229,5 +229,5 @@ export const compress = (indexStream: number[], minCodeSize: number) => {
   // 9. 输出 End of Information Code 到 Code Stream
   pushCode(2 ** minCodeSize + 1, context)
 
-  return packedBytes(context.bitTemp, minCodeSize)
+  return packedBytes(context.bitStream, minCodeSize)
 }

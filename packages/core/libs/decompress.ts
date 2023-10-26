@@ -32,7 +32,7 @@ export const decompressLZW = (data: GraphicData): ParsedImage => {
       data
     } = image
 
-    const { subData = [], minCodeSize = 2 } = data || {}
+    const { subBlocks = [], minCodeSize = 2 } = data || {}
     const {
       localColorTableFlag,
       left,
@@ -56,7 +56,7 @@ export const decompressLZW = (data: GraphicData): ParsedImage => {
     ) ?? []
 
     // 解析成索引流
-    const indexStream = readSubData(subData, minCodeSize)
+    const indexStream = readSubBlocks(subBlocks, minCodeSize)
     // 解析成图像数据
     const imageData = transfer2imageData(
       canvas,
@@ -88,7 +88,7 @@ export const decompressLZW = (data: GraphicData): ParsedImage => {
   }
 }
 
-const readSubData = (blocks: number[][], minCodeSize: number) => {
+const readSubBlocks = (blocks: number[][], minCodeSize: number) => {
   const br = createBitReader()
   const indexStream: number[] = []
   const codeUnits: CodeUnitItem[] = []
@@ -110,7 +110,6 @@ const readSubData = (blocks: number[][], minCodeSize: number) => {
   init()
 
   blocks.forEach(block => {
-    // const bitArray = createBitArray(block)
     br.pushBytes(block)
     while (br.hasBits(size)) {
       // 让 `CODE` 成为 code stream 中的第一个代码
