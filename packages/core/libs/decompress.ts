@@ -22,6 +22,12 @@ export const decompressLZW = (data: GraphicData): ParsedImage => {
   // 初始化 canvas, 用于生成 imageData
   const canvas = document.createElement('canvas')
 
+  if (bgColor) {
+    const ctx = canvas.getContext('2d', { willReadFrequently: true })!
+    ctx.fillStyle = `rgb(${bgColor.join(',')})`
+    ctx.fillRect(0, 0, width ?? 0, height ?? 0)
+  }
+
   Object.assign(canvas, { width, height })
 
   const images = data.images.map<ParsedImageItem>(image => {
