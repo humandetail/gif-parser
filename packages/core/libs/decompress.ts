@@ -19,6 +19,8 @@ export const decompressLZW = (data: GraphicData): ParsedImage => {
     ? globalColorTable![backgroundColorIndex!]
     : null
 
+  console.log(bgColor)
+
   // 初始化 canvas, 用于生成 imageData
   const canvas = document.createElement('canvas')
 
@@ -30,6 +32,7 @@ export const decompressLZW = (data: GraphicData): ParsedImage => {
 
   Object.assign(canvas, { width, height })
 
+  let nextDisposal = 0
   const images = data.images.map<ParsedImageItem>(image => {
     const {
       localColorTable,
@@ -70,8 +73,10 @@ export const decompressLZW = (data: GraphicData): ParsedImage => {
       colorTable,
       imageDescriptor,
       transparencyFlag ? transparencyIndex : -1,
-      disposal
+      nextDisposal
     )
+
+    nextDisposal = disposal || 0
 
     return {
       left: left || 0,
@@ -85,6 +90,8 @@ export const decompressLZW = (data: GraphicData): ParsedImage => {
       imageData
     }
   })
+
+  console.log(images)
 
   return {
     width: width || 0,
