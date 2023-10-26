@@ -202,6 +202,14 @@ const parseApplicationExtension = (context: Context, introducer: number, label: 
     subDataSize = context.consume()
   }
 
+  // 看起来似乎只有一个 block 是在指示着动画应该循环几次
+  // 所以只取第 0 项
+  let cycleIndex = 0
+  if (data.length > 0) {
+    const [, t0, t1] = data[0]
+    cycleIndex = computedSize(t0, t1)
+  }
+
   const terminator = subDataSize
 
   if (terminator !== 0) {
@@ -215,6 +223,7 @@ const parseApplicationExtension = (context: Context, introducer: number, label: 
     identifier: identifier.map(item => String.fromCodePoint(item)),
     authCode: authCode.map(item => String.fromCodePoint(item)),
     data,
+    cycleIndex,
     terminator: 0
   }
 }
@@ -228,6 +237,10 @@ const parseCommentExtension = (context: Context, introducer: number, label: numb
     subBlocksSize = context.consume()
   }
 
+  const comment = data.reduce((acc: string[], item) => {
+    return acc.concat(item.slice(1).map(val => String.fromCodePoint(val)))
+  }, []).join('')
+
   const terminator = subBlocksSize
 
   if (terminator !== 0) {
@@ -237,7 +250,7 @@ const parseCommentExtension = (context: Context, introducer: number, label: numb
   context.graphicData.commentExtension = {
     introducer,
     label,
-    data,
+    comment,
     terminator: 0
   }
 }

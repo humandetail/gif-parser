@@ -56,20 +56,22 @@ export interface LogicalScreenDescriptor {
 }
 
 interface Extension {
-  introducer: number,
-  label: number,
+  introducer: number
+  label: number
   size?: number
   terminator: number
 }
 
 export interface ApplicationExtension extends Extension {
-  identifier: string[],
-  authCode: string[],
+  identifier: string[]
+  authCode: string[]
   data: SubBlocks[]
+  // 指示图像动画的循环次数，0 表示永远循环
+  cycleIndex: number
 }
 
 export interface CommentExtension extends Extension {
-  data: SubBlocks[],
+  comment: string,
 }
 
 /** 图形控制扩展块 */

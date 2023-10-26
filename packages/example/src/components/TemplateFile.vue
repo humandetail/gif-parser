@@ -13,6 +13,7 @@
         <img
           :src="img"
           :alt="img"
+          width="50"
         />
       </li>
     </ul>

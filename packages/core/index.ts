@@ -14,6 +14,7 @@ const parse = async (source: string | File) => {
   const dataView = await readFile(source)
 
   const graphicData = parseDataView(dataView)
+  console.log(graphicData)
   return decompressLZW(graphicData)
 }
 
