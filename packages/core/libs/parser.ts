@@ -35,6 +35,8 @@ const createContext = (dataView: DataView): Context => {
       header: [],
       logicalScreenDescriptor: null,
       globalColorTable: null,
+      applicationExtension: null,
+      commentExtension: null,
       images: []
     }
   }
@@ -63,9 +65,7 @@ export const parseDataView = (dataView: DataView) => {
     if (isNewImage && introducer !== 0x3B) {
       context.graphicData.images.push({
         data: null,
-        applicationExtension: null,
         graphicControlExtension: null,
-        commentExtension: null,
         imageDescriptor: null,
         plainTextExtension: null,
         localColorTable: null
@@ -208,9 +208,7 @@ const parseApplicationExtension = (context: Context, introducer: number, label: 
     throw new Error(`Terminator parse error: ${terminator}`)
   }
 
-  const lastImage = context.graphicData.images.at(-1)!
-
-  lastImage.applicationExtension = {
+  context.graphicData.applicationExtension = {
     introducer,
     label,
     size,
@@ -236,9 +234,7 @@ const parseCommentExtension = (context: Context, introducer: number, label: numb
     throw new Error(`Terminator parse error: ${terminator}`)
   }
 
-  const lastImage = context.graphicData.images.at(-1)!
-
-  lastImage.commentExtension = {
+  context.graphicData.commentExtension = {
     introducer,
     label,
     data,

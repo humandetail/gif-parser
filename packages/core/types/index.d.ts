@@ -130,9 +130,9 @@ export interface ImageDescriptor {
   top: number
   width: number
   height: number
-  /** 指示紧随该图像描述符之后存在局部颜色表。（该字段是字节的最高有效位。） */
+  /** 指示紧随该图像描述符之后存在局部颜色表 */
   localColorTableFlag: boolean
-  /** 指示图像是否隔行扫描。 图像以四通道交错模式交错 */
+  /** 指示图像是否隔行扫描，图像以四通道交错模式交错 */
   interlaced: boolean
   colorSorted: boolean
   reserved: number
@@ -140,8 +140,6 @@ export interface ImageDescriptor {
 }
 
 export interface ImageBytes {
-  applicationExtension: ApplicationExtension | null
-  commentExtension: CommentExtension | null
   graphicControlExtension: GraphicControlExtension | null
   data: null | {
     minCodeSize: number
@@ -157,6 +155,8 @@ export interface GraphicData {
   header: string[]
   logicalScreenDescriptor: LogicalScreenDescriptor | null
   globalColorTable: RGB[] | null
+  commentExtension: CommentExtension | null
+  applicationExtension: ApplicationExtension | null
   images: ImageBytes[]
   trailer?: number
 }
