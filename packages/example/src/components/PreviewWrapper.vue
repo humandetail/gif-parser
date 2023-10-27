@@ -1,5 +1,5 @@
 <template>
-  <section class="preview-wrapper">
+  <section class="preview-wrapper" style="margin-top: 16px;">
     <div ref="containerRef" class="container"></div>
   </section>
 </template>
@@ -17,7 +17,13 @@ watchEffect(() => {
   if (data.value) {
     destroy()
 
-    const action = rebuildGIF(data.value)
+    const action = rebuildGIF(data.value, {
+      // changeCycleIndex: () => 1,
+      // changeImages: (images) => images.map(image => {
+      //   image.delayTime = 50
+      //   return image
+      // })
+    })
 
     const canvas = action.build()
     destroy = action.destroy

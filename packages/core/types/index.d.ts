@@ -194,5 +194,11 @@ export interface ParsedImage {
   width: number
   height: number
   bgColor: RGB | null
-  images: ParsedImageItem[]
+  images: ParsedImageItem[],
+  cycleIndex: number
+}
+
+export interface RebuildOptions {
+  changeCycleIndex?: (cycleIndex: number) => number
+  changeImages?: (images: ParsedImageItem[]) => ParsedImageItem[]
 }

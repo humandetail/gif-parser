@@ -4,7 +4,8 @@ import type { CodeUnitItem, GraphicData, ImageDescriptor, ParsedImage, ParsedIma
 export const decompressLZW = (data: GraphicData): ParsedImage => {
   const {
     globalColorTable,
-    logicalScreenDescriptor
+    logicalScreenDescriptor,
+    applicationExtension
   } = data
 
   const {
@@ -18,8 +19,6 @@ export const decompressLZW = (data: GraphicData): ParsedImage => {
   const bgColor = globalColorTableFlag
     ? globalColorTable![backgroundColorIndex!]
     : null
-
-  console.log(bgColor)
 
   // 初始化 canvas, 用于生成 imageData
   const canvas = document.createElement('canvas')
@@ -91,13 +90,12 @@ export const decompressLZW = (data: GraphicData): ParsedImage => {
     }
   })
 
-  console.log(images)
-
   return {
     width: width || 0,
     height: height || 0,
     bgColor,
-    images
+    images,
+    cycleIndex: applicationExtension?.cycleIndex || 0
   }
 }
 
